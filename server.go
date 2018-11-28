@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -12,6 +13,9 @@ import (
 )
 
 func main() {
+	var bind = flag.String("bind", ":8080", "ip:port")
+	flag.Parse()
+
 	common.InitDB()
 	eth.Init()
 	btc.Init()
@@ -28,7 +32,7 @@ func main() {
 	ws.Route(ws.GET("/deposit/{type}/{addr}/{value}").To(getDepositHandler))
 	ws.Route(ws.POST("/deposit").To(depositHandler))
 	restful.Add(ws)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(*bind, nil))
 }
 
 func hello(req *restful.Request, resp *restful.Response) {

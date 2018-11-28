@@ -13,7 +13,7 @@ import (
 var state = []string{"holding", "online", "pending"}
 var stateIndicator = 0
 
-// orders may skip certain state, but will not revert to previous state.
+// orders may skip certain states, but will not revert after done/fail.
 // tx state is not covered.
 func orderStateUpdate() {
 	ticker := time.NewTicker(common.UPDATETICKER * time.Second)
