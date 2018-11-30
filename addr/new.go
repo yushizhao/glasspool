@@ -7,6 +7,8 @@ import (
 	"github.com/yushizhao/glasspool/node/btc"
 	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/usdc"
+	"github.com/yushizhao/glasspool/node/usdt"
 	"github.com/yushizhao/glasspool/order"
 )
 
@@ -37,9 +39,21 @@ func (input POSTAddressesNew) Process() (output POSTAddressesNewResult, err erro
 		output.Address = address
 		output.State = "used"
 		return output, err
+	case "USDC":
+		secret, address, err := usdc.GenerateAddress()
+		common.Gdb.WALLET([]byte(input.Type+address), secret)
+		output.Address = address
+		output.State = "used"
+		return output, err
 	case "BTC":
 		// fix seed HD
 		address, err := btc.GenerateAddress()
+		output.Address = address
+		output.State = "used"
+		return output, err
+	case "USDT":
+		// fix seed HD
+		address, err := usdt.GenerateAddress()
 		output.Address = address
 		output.State = "used"
 		return output, err
@@ -82,6 +96,28 @@ func (input POSTAddressesNewResult) AutoDeposit() (tx order.TxData, err error) {
 
 		tx.Type = input.Type
 
+	case "USDC":
+		usdc.UpdateBlockNumber()
+		tx.TimestampBegin = usdc.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = usdc.CurrentHeight
+		tx.BlockHash = usdc.CurrentHash
+		tx.Hash = usdc.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
+
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / usdc.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
+
+		tx.Fee = usdc.Fee
+
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: usdc.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
+
+		tx.Type = input.Type
+
 	case "BTC":
 		btc.UpdateBlockNumber()
 		tx.TimestampBegin = btc.CurrentTime
@@ -100,6 +136,28 @@ func (input POSTAddressesNewResult) AutoDeposit() (tx order.TxData, err error) {
 
 		valueFrom := valueTo + tx.Fee
 		txpointFrom := order.TxPoint{Address: btc.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
+
+		tx.Type = input.Type
+
+	case "USDT":
+		usdt.UpdateBlockNumber()
+		tx.TimestampBegin = usdt.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = usdt.CurrentHeight
+		tx.BlockHash = usdt.CurrentHash
+		tx.Hash = usdt.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
+
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / usdt.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
+
+		tx.Fee = usdt.Fee
+
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: usdt.COINBASE, Value: common.Float64string(valueFrom)}
 		tx.From = []order.TxPoint{txpointFrom}
 
 		tx.Type = input.Type

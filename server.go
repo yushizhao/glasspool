@@ -9,7 +9,10 @@ import (
 	"github.com/emicklei/go-restful"
 	"github.com/yushizhao/glasspool/common"
 	"github.com/yushizhao/glasspool/node/btc"
+	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/usdc"
+	"github.com/yushizhao/glasspool/node/usdt"
 )
 
 func main() {
@@ -18,7 +21,10 @@ func main() {
 
 	common.InitDB()
 	eth.Init()
+	usdc.Init()
 	btc.Init()
+	usdt.Init()
+	eos.Init()
 
 	go orderStateUpdate()
 
