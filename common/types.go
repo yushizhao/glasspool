@@ -19,10 +19,12 @@ type ReturnBody struct {
 }
 
 type ReturnBodySig struct {
-	ReturnBody
-	Crypto    string  `json:"crypto"`
-	Timestamp int64   `json:"timestamp"`
-	Sig       SigJSON `json:"sig"`
+	Message   string      `json:"message"`
+	Result    interface{} `json:"result"`
+	Status    int         `json:"status"`
+	Crypto    string      `json:"crypto"`
+	Timestamp int64       `json:"timestamp"`
+	Sig       SigJSON     `json:"sig"`
 }
 
 // parse data

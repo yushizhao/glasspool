@@ -14,25 +14,29 @@ import (
 	"github.com/yushizhao/glasspool/order"
 )
 
-func callback(url string, body interface{}) {
+func callback(url string, body common.ReturnBody) {
 
-	returnBody := new(common.ReturnBodySig)
-	returnBody.Normalize(body)
-	returnBody.Crypto = "ecc"
-	returnBody.Timestamp = common.Timestamp()
+	returnBody := common.ReturnBodySig{
+		Message:   body.Message,
+		Result:    body.Result,
+		Status:    body.Status,
+		Crypto:    "ecc",
+		Timestamp: common.Timestamp(),
+		Sig:       common.SigJSON{},
+	}
 
 	if common.ECC {
 		data := make(map[string]interface{})
-		dataBytes, _ := json.Marshal(returnBody.Result)
+		dataBytes, _ := json.Marshal(body.Result)
 		json.Unmarshal(dataBytes, data)
 		data["timestamp"] = returnBody.Timestamp
 		msg := common.MapMessage(data)
 		sig, err := common.ECCSignature([]byte(msg), common.KEY)
+		returnBody.Sig = sig
 		if err != nil {
 			log.Printf("callback ECCSignature %v: %v", url, err)
 			return
 		}
-		returnBody.Sig = sig
 	}
 
 	log.Printf("\ncallback\n")
@@ -43,7 +47,7 @@ func callback(url string, body interface{}) {
 		SetBody(returnBody).
 		Post(url)
 	if err != nil {
-		log.Printf("callback %v: %v", url, err)
+		log.Printf("\ncallback err %v: %v", url, err)
 		return
 	}
 
@@ -203,7 +207,7 @@ func depositHandler(req *restful.Request, resp *restful.Response) {
 
 	returnBody.Normalize(orderData)
 
-	callback(url, returnBody)
+	callback(url, *returnBody)
 }
 
 func getDepositHandler(req *restful.Request, resp *restful.Response) {

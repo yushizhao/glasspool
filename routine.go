@@ -50,7 +50,7 @@ func orderStateUpdate() {
 					returnBody := new(common.ReturnBody)
 					returnBody.Normalize(order)
 					log.Println(common.JSONstring(returnBody))
-					callback(string(urlBytes), returnBody)
+					callback(string(urlBytes), *returnBody)
 				}
 
 				stateIndicator = 0
@@ -76,7 +76,7 @@ func orderStateUpdate() {
 					returnBody := new(common.ReturnBody)
 					returnBody.Normalize(order)
 					log.Println(common.JSONstring(returnBody))
-					callback(string(urlBytes), returnBody)
+					callback(string(urlBytes), *returnBody)
 				}
 
 				stateIndicator++
