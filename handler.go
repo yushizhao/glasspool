@@ -33,6 +33,9 @@ func callback(url string, body interface{}) {
 		postBody.Sig = sig
 	}
 
+	log.Printf("\ncallback\n")
+	log.Printf(common.JSONstring(postBody))
+
 	resp, err := resty.R().
 		// SetHeader("Content-Type", common.MIME).
 		SetBody(postBody).

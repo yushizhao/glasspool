@@ -16,14 +16,6 @@ func JSONstring(a interface{}) string {
 	return string(res)
 }
 
-// func JSONstringUnquote(a interface{}) string {
-// 	res, err := strconv.Unquote(JSONstring(a))
-// 	if err != nil {
-// 		return "error"
-// 	}
-// 	return res
-// }
-
 // to millisecond
 func Timestamp() int64 {
 	return time.Now().UnixNano() / 1e6
