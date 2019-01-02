@@ -16,29 +16,31 @@ import (
 
 func callback(url string, body interface{}) {
 
-	postBody := new(common.POSTBody)
+	returnBody := new(common.ReturnBodySig)
+	returnBody.Normalize(body)
+	returnBody.Crypto = "ecc"
+	returnBody.Timestamp = common.Timestamp()
 
 	if common.ECC {
-		postBody.Data = body
 		data := make(map[string]interface{})
-		dataBytes, _ := json.Marshal(postBody.Data)
+		dataBytes, _ := json.Marshal(returnBody.Result)
 		json.Unmarshal(dataBytes, data)
-		data["timestamp"] = common.Timestamp()
+		data["timestamp"] = returnBody.Timestamp
 		msg := common.MapMessage(data)
 		sig, err := common.ECCSignature([]byte(msg), common.KEY)
 		if err != nil {
 			log.Printf("callback ECCSignature %v: %v", url, err)
 			return
 		}
-		postBody.Sig = sig
+		returnBody.Sig = sig
 	}
 
 	log.Printf("\ncallback\n")
-	log.Printf(common.JSONstring(postBody))
+	log.Printf(common.JSONstring(returnBody))
 
 	resp, err := resty.R().
 		// SetHeader("Content-Type", common.MIME).
-		SetBody(postBody).
+		SetBody(returnBody).
 		Post(url)
 	if err != nil {
 		log.Printf("callback %v: %v", url, err)

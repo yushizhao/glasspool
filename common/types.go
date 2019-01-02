@@ -18,6 +18,13 @@ type ReturnBody struct {
 	Status  int         `json:"status"`
 }
 
+type ReturnBodySig struct {
+	ReturnBody
+	Crypto    string  `json:"crypto"`
+	Timestamp int64   `json:"timestamp"`
+	Sig       SigJSON `json:"sig"`
+}
+
 // parse data
 func (it *POSTBody) Extract(data interface{}) {
 	dataBytes, _ := json.Marshal(it.Data)
