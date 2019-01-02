@@ -19,7 +19,7 @@ func callback(url string, body interface{}) {
 	postBody := new(common.POSTBody)
 
 	if common.ECC {
-		postBody.Extract(body)
+		postBody.Data = body
 		data := make(map[string]interface{})
 		dataBytes, _ := json.Marshal(postBody.Data)
 		json.Unmarshal(dataBytes, data)
