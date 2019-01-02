@@ -20,7 +20,7 @@ func main() {
 	var key = flag.String("key", "", "glasspool private key")
 	flag.Parse()
 
-	common.KEY = key
+	common.KEY = *key
 
 	common.InitDB()
 	eth.Init()
