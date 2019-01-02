@@ -9,3 +9,8 @@ const (
 	FAILRATE     = 7 // order states update to failed
 
 )
+
+var (
+	KEY = ""
+	ECC = true
+)

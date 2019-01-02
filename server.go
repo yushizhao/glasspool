@@ -17,7 +17,10 @@ import (
 
 func main() {
 	var bind = flag.String("bind", ":8080", "ip:port")
+	var key = flag.String("key", "", "glasspool private key")
 	flag.Parse()
+
+	common.KEY = key
 
 	common.InitDB()
 	eth.Init()

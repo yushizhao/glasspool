@@ -15,9 +15,27 @@ import (
 )
 
 func callback(url string, body interface{}) {
+
+	postBody := new(common.POSTBody)
+
+	if common.ECC {
+		postBody.Extract(body)
+		data := make(map[string]interface{})
+		dataBytes, _ := json.Marshal(postBody.Data)
+		json.Unmarshal(dataBytes, data)
+		data["timestamp"] = common.Timestamp()
+		msg := common.MapMessage(data)
+		sig, err := common.ECCSignature([]byte(msg), common.KEY)
+		if err != nil {
+			log.Printf("callback ECCSignature %v: %v", url, err)
+			return
+		}
+		postBody.Sig = sig
+	}
+
 	resp, err := resty.R().
 		// SetHeader("Content-Type", common.MIME).
-		SetBody(body).
+		SetBody(postBody).
 		Post(url)
 	if err != nil {
 		log.Printf("callback %v: %v", url, err)
