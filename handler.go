@@ -26,10 +26,13 @@ func callback(url string, body common.ReturnBody) {
 	}
 
 	if common.ECC {
-		data := make(map[string]interface{})
+		var f interface{}
 		dataBytes, _ := json.Marshal(body.Result)
-		json.Unmarshal(dataBytes, data)
+		json.Unmarshal(dataBytes, f)
+		data := f.(map[string]interface{})
+
 		data["timestamp"] = returnBody.Timestamp
+
 		msg := common.MapMessage(data)
 		sig, err := common.ECCSignature([]byte(msg), common.KEY)
 		returnBody.Sig = sig
