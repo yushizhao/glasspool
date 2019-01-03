@@ -26,9 +26,10 @@ func callback(url string, body common.ReturnBody) {
 	}
 
 	if common.ECC {
-		var f interface{}
 		dataBytes, _ := json.Marshal(body.Result)
-		json.Unmarshal(dataBytes, f)
+
+		var f interface{}
+		json.Unmarshal(dataBytes, &f)
 		data := f.(map[string]interface{})
 
 		data["timestamp"] = returnBody.Timestamp
