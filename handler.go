@@ -181,6 +181,12 @@ func orderIDHandler(req *restful.Request, resp *restful.Response) {
 	io.WriteString(resp, common.JSONstring(returnBody))
 }
 
+func configHandler(req *restful.Request, resp *restful.Response) {
+	returnBody := new(common.ReturnBody)
+	returnBody.Normalize("dummy")
+	io.WriteString(resp, common.JSONstring(returnBody))
+}
+
 func depositHandler(req *restful.Request, resp *restful.Response) {
 	txData := new(order.TxData)
 	returnBody := new(common.ReturnBody)

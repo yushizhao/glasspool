@@ -37,6 +37,7 @@ func main() {
 	ws.Route(ws.POST("/api/v1/addresses/{addr}/verify").To(addressesVerifyHandler))
 	ws.Route(ws.POST("/api/v1/transactions").To(transactionsHandler))
 	ws.Route(ws.GET("/api/v1/transactions/{orderId}").To(orderIDHandler))
+	ws.Route(ws.POST("/api/v1/config/callback").To(configHandler))
 
 	ws.Route(ws.GET("/deposit/{type}/{addr}/{value}").To(getDepositHandler))
 	ws.Route(ws.POST("/deposit").To(depositHandler))
