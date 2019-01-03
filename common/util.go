@@ -52,6 +52,10 @@ func MapMessage(m map[string]interface{}) (msg string) {
 
 		e := m[k]
 
+		if tf, ok := e.(bool); ok {
+			msg += strconv.FormatBool(tf)
+		}
+
 		if str, ok := e.(string); ok {
 			msg += str
 			continue
@@ -77,36 +81,49 @@ func MapMessage(m map[string]interface{}) (msg string) {
 			continue
 		}
 
+		if a, ok := e.([]bool); ok {
+			for id, tf := range a {
+				msg += strconv.Itoa(id)
+				msg += strconv.FormatBool(tf)
+			}
+			continue
+		}
+
 		if a, ok := e.([]string); ok {
-			for _, str := range a {
+			for id, str := range a {
+				msg += strconv.Itoa(id)
 				msg += str
 			}
 			continue
 		}
 
 		if a, ok := e.([]int); ok {
-			for _, i := range a {
+			for id, i := range a {
+				msg += strconv.Itoa(id)
 				msg += strconv.Itoa(i)
 			}
 			continue
 		}
 
 		if a, ok := e.([]int64); ok {
-			for _, i := range a {
+			for id, i := range a {
+				msg += strconv.Itoa(id)
 				msg += strconv.FormatInt(i, 10)
 			}
 			continue
 		}
 
 		if a, ok := e.([]float64); ok {
-			for _, f := range a {
+			for id, f := range a {
+				msg += strconv.Itoa(id)
 				msg += Float64string(f)
 			}
 			continue
 		}
 
 		if a, ok := e.([]map[string]interface{}); ok {
-			for _, subm := range a {
+			for id, subm := range a {
+				msg += strconv.Itoa(id)
 				msg += MapMessage(subm)
 			}
 			continue
@@ -123,7 +140,13 @@ func MapMessage(m map[string]interface{}) (msg string) {
 
 // generate message to sign
 func ArrayMessage(a []interface{}) (msg string) {
-	for _, e := range a {
+	for id, e := range a {
+
+		msg += strconv.Itoa(id)
+
+		if tf, ok := e.(bool); ok {
+			msg += strconv.FormatBool(tf)
+		}
 
 		if str, ok := e.(string); ok {
 			msg += str
@@ -150,36 +173,49 @@ func ArrayMessage(a []interface{}) (msg string) {
 			continue
 		}
 
+		if a, ok := e.([]bool); ok {
+			for id, tf := range a {
+				msg += strconv.Itoa(id)
+				msg += strconv.FormatBool(tf)
+			}
+			continue
+		}
+
 		if a, ok := e.([]string); ok {
-			for _, str := range a {
+			for id, str := range a {
+				msg += strconv.Itoa(id)
 				msg += str
 			}
 			continue
 		}
 
 		if a, ok := e.([]int); ok {
-			for _, i := range a {
+			for id, i := range a {
+				msg += strconv.Itoa(id)
 				msg += strconv.Itoa(i)
 			}
 			continue
 		}
 
 		if a, ok := e.([]int64); ok {
-			for _, i := range a {
+			for id, i := range a {
+				msg += strconv.Itoa(id)
 				msg += strconv.FormatInt(i, 10)
 			}
 			continue
 		}
 
 		if a, ok := e.([]float64); ok {
-			for _, f := range a {
+			for id, f := range a {
+				msg += strconv.Itoa(id)
 				msg += Float64string(f)
 			}
 			continue
 		}
 
 		if a, ok := e.([]map[string]interface{}); ok {
-			for _, subm := range a {
+			for id, subm := range a {
+				msg += strconv.Itoa(id)
 				msg += MapMessage(subm)
 			}
 			continue
