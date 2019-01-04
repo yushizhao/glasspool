@@ -13,6 +13,7 @@ import (
 	"github.com/yushizhao/glasspool/node/eth"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
+	"github.com/yushizhao/glasspool/node/xrp"
 )
 
 func main() {
@@ -28,6 +29,7 @@ func main() {
 	btc.Init()
 	usdt.Init()
 	eos.Init()
+	xrp.Init()
 
 	go orderStateUpdate()
 

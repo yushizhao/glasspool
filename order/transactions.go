@@ -10,6 +10,7 @@ import (
 	"github.com/yushizhao/glasspool/node/eth"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
+	"github.com/yushizhao/glasspool/node/xrp"
 )
 
 type POSTTransactions struct {
@@ -205,6 +206,30 @@ func (input POSTTransactions) Process(bizType string) (output POSTTransactionsRe
 		txpointFrom := TxPoint{Address: eos.COINBASE, Value: common.Float64string(valueFrom)}
 		txdata.From = []TxPoint{txpointFrom}
 
+	case "XRP":
+		txdata.Type = input.Type
+
+		xrp.UpdateBlockNumber()
+		txdata.TimestampBegin = xrp.CurrentTime
+		txdata.TimestampFinish = txdata.TimestampBegin
+		txdata.BlockNumber = xrp.CurrentHeight
+		txdata.BlockHash = xrp.CurrentHash
+		txdata.Hash = xrp.HashInt(txdata.TimestampBegin)
+		txdata.Confirmations = 0
+		// more plausible? e.g. N to N tx
+		txpointTo := TxPoint{input.To, input.Value}
+		txdata.To = []TxPoint{txpointTo}
+
+		txdata.Fee = xrp.Fee
+
+		v, err := strconv.ParseFloat(input.Value, 64)
+		if err != nil {
+			return output, err
+		}
+		valueFrom := v + txdata.Fee
+		txpointFrom := TxPoint{Address: xrp.COINBASE, Value: common.Float64string(valueFrom)}
+		txdata.From = []TxPoint{txpointFrom}
+
 	default:
 		return output, fmt.Errorf("unexpected type: %v", input.Type)
 	}
@@ -242,6 +267,11 @@ func (input TxData) Submit(bizType string) (output POSTTransactionsResult, err e
 	// 	output.Value = input.To[0].Value
 	case "EOS", "eos":
 		output.CoinType = "EOS"
+		// target the first point
+		output.To = input.To[0].Address
+		output.Value = input.To[0].Value
+	case "XRP", "xrp":
+		output.CoinType = "XRP"
 		// target the first point
 		output.To = input.To[0].Address
 		output.Value = input.To[0].Value

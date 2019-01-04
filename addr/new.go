@@ -9,6 +9,7 @@ import (
 	"github.com/yushizhao/glasspool/node/eth"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
+	"github.com/yushizhao/glasspool/node/xrp"
 	"github.com/yushizhao/glasspool/order"
 )
 
@@ -67,6 +68,11 @@ func (input POSTAddressesNew) Process() (output POSTAddressesNewResult, err erro
 		output.Address = address
 		output.State = "used"
 		return output, nil
+	case "XRP":
+		address, err := xrp.GenerateAddress()
+		output.Address = address
+		output.State = "used"
+		return output, err
 	default:
 		return output, fmt.Errorf("unexpected type: %v", input.Type)
 	}
@@ -202,6 +208,28 @@ func (input POSTAddressesNewResult) AutoDeposit() (tx order.TxData, err error) {
 
 		valueFrom := valueTo + tx.Fee
 		txpointFrom := order.TxPoint{Address: eos.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
+
+		tx.Type = input.Type
+
+	case "XRP":
+		xrp.UpdateBlockNumber()
+		tx.TimestampBegin = xrp.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = xrp.CurrentHeight
+		tx.BlockHash = xrp.CurrentHash
+		tx.Hash = xrp.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
+
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / xrp.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
+
+		tx.Fee = xrp.Fee
+
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: xrp.COINBASE, Value: common.Float64string(valueFrom)}
 		tx.From = []order.TxPoint{txpointFrom}
 
 		tx.Type = input.Type
