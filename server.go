@@ -11,6 +11,7 @@ import (
 	"github.com/yushizhao/glasspool/node/btc"
 	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
 	"github.com/yushizhao/glasspool/node/xrp"
@@ -27,6 +28,7 @@ func main() {
 	eth.Init()
 	usdc.Init()
 	btc.Init()
+	ltc.Init()
 	usdt.Init()
 	eos.Init()
 	xrp.Init()

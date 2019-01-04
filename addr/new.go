@@ -5,8 +5,10 @@ import (
 
 	"github.com/yushizhao/glasspool/common"
 	"github.com/yushizhao/glasspool/node/btc"
+	"github.com/yushizhao/glasspool/node/cyb"
 	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
 	"github.com/yushizhao/glasspool/node/xrp"
@@ -52,17 +54,23 @@ func (input POSTAddressesNew) Process() (output POSTAddressesNewResult, err erro
 		output.Address = address
 		output.State = "used"
 		return output, err
+	case "LTC":
+		// fix seed HD
+		address, err := ltc.GenerateAddress()
+		output.Address = address
+		output.State = "used"
+		return output, err
 	case "USDT":
 		// fix seed HD
 		address, err := usdt.GenerateAddress()
 		output.Address = address
 		output.State = "used"
 		return output, err
-	// case "CYB":
-	// 	address := cyb.GenerateAddress()
-	// 	output.Address = address
-	// 	output.State = "used"
-	// 	return output, nil
+	case "CYB":
+		address := cyb.GenerateAddress()
+		output.Address = address
+		output.State = "used"
+		return output, nil
 	case "EOS":
 		address := eos.GenerateAddress()
 		output.Address = address
@@ -146,6 +154,28 @@ func (input POSTAddressesNewResult) AutoDeposit() (tx order.TxData, err error) {
 
 		tx.Type = input.Type
 
+	case "LTC":
+		ltc.UpdateBlockNumber()
+		tx.TimestampBegin = ltc.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = ltc.CurrentHeight
+		tx.BlockHash = ltc.CurrentHash
+		tx.Hash = ltc.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
+
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / ltc.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
+
+		tx.Fee = ltc.Fee
+
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: ltc.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
+
+		tx.Type = input.Type
+
 	case "USDT":
 		usdt.UpdateBlockNumber()
 		tx.TimestampBegin = usdt.CurrentTime
@@ -168,27 +198,27 @@ func (input POSTAddressesNewResult) AutoDeposit() (tx order.TxData, err error) {
 
 		tx.Type = input.Type
 
-	// case "CYB":
-	// 	cyb.UpdateBlockNumber()
-	// 	tx.TimestampBegin = cyb.CurrentTime
-	// 	tx.TimestampFinish = tx.TimestampBegin
-	// 	tx.BlockNumber = cyb.CurrentHeight
-	// 	tx.BlockHash = cyb.CurrentHash
-	// 	tx.Hash = cyb.HashInt(tx.TimestampBegin)
-	// 	tx.Confirmations = 0
+	case "CYB":
+		cyb.UpdateBlockNumber()
+		tx.TimestampBegin = cyb.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = cyb.CurrentHeight
+		tx.BlockHash = cyb.CurrentHash
+		tx.Hash = cyb.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
 
-	// 	// pseudo random
-	// 	valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / cyb.HEIGHT
-	// 	txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
-	// 	tx.To = []order.TxPoint{txpointTo}
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / cyb.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
 
-	// 	tx.Fee = cyb.Fee
+		tx.Fee = cyb.Fee
 
-	// 	valueFrom := valueTo + tx.Fee
-	// 	txpointFrom := order.TxPoint{Address: cyb.COINBASE, Value: common.Float64string(valueFrom)}
-	// 	tx.From = []order.TxPoint{txpointFrom}
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: cyb.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
 
-	// 	tx.Type = input.Type
+		tx.Type = input.Type
 
 	case "EOS":
 		eos.UpdateBlockNumber()

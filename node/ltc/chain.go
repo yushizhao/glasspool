@@ -1,4 +1,4 @@
-package xrp
+package ltc
 
 import (
 	"time"
@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	HEIGHT    = 44078639
-	TIMESTAMP = 1546235700000
-	TIMESPAN  = 250
-	SEED      = "Glasspool XRP HD Master Key Seed"
-	COINBASE  = "rj8YaPZfYkRtx4xZdws26afjAiXmjBWf3B"
+	HEIGHT    = 1555369
+	TIMESTAMP = 1546585663000
+	TIMESPAN  = 120000
+	SEED      = "Glasspool LTC HD Master Key Seed"
+	COINBASE  = "LZyzAuBPDxC1UdisvxSMTZHJ1Gc2o7ic4A"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 	CurrentHeight int64
 	CurrentTime   int64
 	CurrentHash   string
-	Fee           = 0.2
+	Fee           = 0.001788
 )
 
 func Init() {
@@ -34,7 +34,7 @@ func Init() {
 	CurrentHash = Hash(itob(CurrentHeight))
 
 	// Hack
-	NET.PubKeyHashAddrID = 0x7b
+	NET.PubKeyHashAddrID = 0x30
 }
 
 // linear estimate

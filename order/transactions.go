@@ -6,8 +6,10 @@ import (
 
 	"github.com/yushizhao/glasspool/common"
 	"github.com/yushizhao/glasspool/node/btc"
+	"github.com/yushizhao/glasspool/node/cyb"
 	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
 	"github.com/yushizhao/glasspool/node/xrp"
@@ -134,6 +136,30 @@ func (input POSTTransactions) Process(bizType string) (output POSTTransactionsRe
 		txpointFrom := TxPoint{Address: btc.COINBASE, Value: common.Float64string(valueFrom)}
 		txdata.From = []TxPoint{txpointFrom}
 
+	case "LTC":
+		txdata.Type = input.Type
+
+		ltc.UpdateBlockNumber()
+		txdata.TimestampBegin = ltc.CurrentTime
+		txdata.TimestampFinish = txdata.TimestampBegin
+		txdata.BlockNumber = ltc.CurrentHeight
+		txdata.BlockHash = ltc.CurrentHash
+		txdata.Hash = ltc.HashInt(txdata.TimestampBegin)
+		txdata.Confirmations = 0
+		// more plausible? e.g. N to N tx
+		txpointTo := TxPoint{input.To, input.Value}
+		txdata.To = []TxPoint{txpointTo}
+
+		txdata.Fee = ltc.Fee
+
+		v, err := strconv.ParseFloat(input.Value, 64)
+		if err != nil {
+			return output, err
+		}
+		valueFrom := v + txdata.Fee
+		txpointFrom := TxPoint{Address: ltc.COINBASE, Value: common.Float64string(valueFrom)}
+		txdata.From = []TxPoint{txpointFrom}
+
 	case "USDT":
 		txdata.Type = input.Type
 
@@ -158,29 +184,29 @@ func (input POSTTransactions) Process(bizType string) (output POSTTransactionsRe
 		txpointFrom := TxPoint{Address: usdt.COINBASE, Value: common.Float64string(valueFrom)}
 		txdata.From = []TxPoint{txpointFrom}
 
-	// case "CYB":
-	// 	txdata.Type = input.Type
+	case "CYB":
+		txdata.Type = input.Type
 
-	// 	cyb.UpdateBlockNumber()
-	// 	txdata.TimestampBegin = cyb.CurrentTime
-	// 	txdata.TimestampFinish = txdata.TimestampBegin
-	// 	txdata.BlockNumber = cyb.CurrentHeight
-	// 	txdata.BlockHash = cyb.CurrentHash
-	// 	txdata.Hash = cyb.HashInt(txdata.TimestampBegin)
-	// 	txdata.Confirmations = 0
-	// 	// more plausible? e.g. N to N tx
-	// 	txpointTo := TxPoint{input.To, input.Value}
-	// 	txdata.To = []TxPoint{txpointTo}
+		cyb.UpdateBlockNumber()
+		txdata.TimestampBegin = cyb.CurrentTime
+		txdata.TimestampFinish = txdata.TimestampBegin
+		txdata.BlockNumber = cyb.CurrentHeight
+		txdata.BlockHash = cyb.CurrentHash
+		txdata.Hash = cyb.HashInt(txdata.TimestampBegin)
+		txdata.Confirmations = 0
+		// more plausible? e.g. N to N tx
+		txpointTo := TxPoint{input.To, input.Value}
+		txdata.To = []TxPoint{txpointTo}
 
-	// 	txdata.Fee = cyb.Fee
+		txdata.Fee = cyb.Fee
 
-	// 	v, err := strconv.ParseFloat(input.Value, 64)
-	// 	if err != nil {
-	// 		return output, err
-	// 	}
-	// 	valueFrom := v + txdata.Fee
-	// 	txpointFrom := TxPoint{Address: cyb.COINBASE, Value: common.Float64string(valueFrom)}
-	// 	txdata.From = []TxPoint{txpointFrom}
+		v, err := strconv.ParseFloat(input.Value, 64)
+		if err != nil {
+			return output, err
+		}
+		valueFrom := v + txdata.Fee
+		txpointFrom := TxPoint{Address: cyb.COINBASE, Value: common.Float64string(valueFrom)}
+		txdata.From = []TxPoint{txpointFrom}
 
 	case "EOS":
 		txdata.Type = input.Type
@@ -255,16 +281,21 @@ func (input TxData) Submit(bizType string) (output POSTTransactionsResult, err e
 		// target the first point
 		output.To = input.To[0].Address
 		output.Value = input.To[0].Value
+	case "LTC":
+		output.CoinType = "LTC"
+		// target the first point
+		output.To = input.To[0].Address
+		output.Value = input.To[0].Value
 	case "USDT":
 		output.CoinType = "USDT"
 		// target the first point
 		output.To = input.To[0].Address
 		output.Value = input.To[0].Value
-	// case "CYB":
-	// 	output.CoinType = "CYB"
-	// 	// target the first point
-	// 	output.To = input.To[0].Address
-	// 	output.Value = input.To[0].Value
+	case "CYB":
+		output.CoinType = "CYB"
+		// target the first point
+		output.To = input.To[0].Address
+		output.Value = input.To[0].Value
 	case "EOS", "eos":
 		output.CoinType = "EOS"
 		// target the first point
