@@ -12,6 +12,7 @@ import (
 	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
+	"github.com/yushizhao/glasspool/node/vet"
 	"github.com/yushizhao/glasspool/node/xrp"
 	"github.com/yushizhao/glasspool/node/zrx"
 	"github.com/yushizhao/glasspool/order"
@@ -40,6 +41,12 @@ func (input POSTAddressesNew) Process() (output POSTAddressesNewResult, err erro
 	switch input.Type {
 	case "ETH":
 		secret, address, err := eth.GenerateAddress()
+		common.Gdb.WALLET([]byte(input.Type+address), secret)
+		output.Address = address
+		output.State = "used"
+		return output, err
+	case "VET":
+		secret, address, err := vet.GenerateAddress()
 		common.Gdb.WALLET([]byte(input.Type+address), secret)
 		output.Address = address
 		output.State = "used"
@@ -120,6 +127,28 @@ func (input POSTAddressesNewResult) AutoDeposit() (tx order.TxData, err error) {
 
 		valueFrom := valueTo + tx.Fee
 		txpointFrom := order.TxPoint{Address: eth.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
+
+		tx.Type = input.Type
+
+	case "VET":
+		vet.UpdateBlockNumber()
+		tx.TimestampBegin = vet.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = vet.CurrentHeight
+		tx.BlockHash = vet.CurrentHash
+		tx.Hash = vet.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
+
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / vet.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
+
+		tx.Fee = vet.Fee
+
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: vet.COINBASE, Value: common.Float64string(valueFrom)}
 		tx.From = []order.TxPoint{txpointFrom}
 
 		tx.Type = input.Type

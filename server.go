@@ -15,6 +15,7 @@ import (
 	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
+	"github.com/yushizhao/glasspool/node/vet"
 	"github.com/yushizhao/glasspool/node/xrp"
 	"github.com/yushizhao/glasspool/node/zrx"
 )
@@ -28,6 +29,7 @@ func main() {
 
 	common.InitDB()
 	eth.Init()
+	vet.Init()
 	usdc.Init()
 	gnt.Init()
 	zrx.Init()
