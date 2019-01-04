@@ -9,10 +9,12 @@ import (
 	"github.com/yushizhao/glasspool/node/cyb"
 	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/gnt"
 	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
 	"github.com/yushizhao/glasspool/node/xrp"
+	"github.com/yushizhao/glasspool/node/zrx"
 )
 
 type POSTTransactions struct {
@@ -110,6 +112,54 @@ func (input POSTTransactions) Process(bizType string) (output POSTTransactionsRe
 		}
 		valueFrom := v + txdata.Fee
 		txpointFrom := TxPoint{Address: usdc.COINBASE, Value: common.Float64string(valueFrom)}
+		txdata.From = []TxPoint{txpointFrom}
+
+	case "GNT":
+		txdata.Type = input.Type
+
+		gnt.UpdateBlockNumber()
+		txdata.TimestampBegin = gnt.CurrentTime
+		txdata.TimestampFinish = txdata.TimestampBegin
+		txdata.BlockNumber = gnt.CurrentHeight
+		txdata.BlockHash = gnt.CurrentHash
+		txdata.Hash = gnt.HashInt(txdata.TimestampBegin)
+		txdata.Confirmations = 0
+
+		txpointTo := TxPoint{input.To, input.Value}
+		txdata.To = []TxPoint{txpointTo}
+
+		txdata.Fee = gnt.Fee
+
+		v, err := strconv.ParseFloat(input.Value, 64)
+		if err != nil {
+			return output, err
+		}
+		valueFrom := v + txdata.Fee
+		txpointFrom := TxPoint{Address: gnt.COINBASE, Value: common.Float64string(valueFrom)}
+		txdata.From = []TxPoint{txpointFrom}
+
+	case "ZRX":
+		txdata.Type = input.Type
+
+		zrx.UpdateBlockNumber()
+		txdata.TimestampBegin = zrx.CurrentTime
+		txdata.TimestampFinish = txdata.TimestampBegin
+		txdata.BlockNumber = zrx.CurrentHeight
+		txdata.BlockHash = zrx.CurrentHash
+		txdata.Hash = zrx.HashInt(txdata.TimestampBegin)
+		txdata.Confirmations = 0
+
+		txpointTo := TxPoint{input.To, input.Value}
+		txdata.To = []TxPoint{txpointTo}
+
+		txdata.Fee = zrx.Fee
+
+		v, err := strconv.ParseFloat(input.Value, 64)
+		if err != nil {
+			return output, err
+		}
+		valueFrom := v + txdata.Fee
+		txpointFrom := TxPoint{Address: zrx.COINBASE, Value: common.Float64string(valueFrom)}
 		txdata.From = []TxPoint{txpointFrom}
 
 	case "BTC":
@@ -273,6 +323,16 @@ func (input TxData) Submit(bizType string) (output POSTTransactionsResult, err e
 		output.Value = input.To[0].Value
 	case "USDC":
 		output.CoinType = "USDC"
+		// target the first point
+		output.To = input.To[0].Address
+		output.Value = input.To[0].Value
+	case "GNT":
+		output.CoinType = "GNT"
+		// target the first point
+		output.To = input.To[0].Address
+		output.Value = input.To[0].Value
+	case "ZRX":
+		output.CoinType = "ZRX"
 		// target the first point
 		output.To = input.To[0].Address
 		output.Value = input.To[0].Value

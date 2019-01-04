@@ -8,10 +8,12 @@ import (
 	"github.com/yushizhao/glasspool/node/cyb"
 	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/gnt"
 	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
 	"github.com/yushizhao/glasspool/node/xrp"
+	"github.com/yushizhao/glasspool/node/zrx"
 	"github.com/yushizhao/glasspool/order"
 )
 
@@ -44,6 +46,18 @@ func (input POSTAddressesNew) Process() (output POSTAddressesNewResult, err erro
 		return output, err
 	case "USDC":
 		secret, address, err := usdc.GenerateAddress()
+		common.Gdb.WALLET([]byte(input.Type+address), secret)
+		output.Address = address
+		output.State = "used"
+		return output, err
+	case "GNT":
+		secret, address, err := gnt.GenerateAddress()
+		common.Gdb.WALLET([]byte(input.Type+address), secret)
+		output.Address = address
+		output.State = "used"
+		return output, err
+	case "ZRX":
+		secret, address, err := zrx.GenerateAddress()
 		common.Gdb.WALLET([]byte(input.Type+address), secret)
 		output.Address = address
 		output.State = "used"
@@ -128,6 +142,50 @@ func (input POSTAddressesNewResult) AutoDeposit() (tx order.TxData, err error) {
 
 		valueFrom := valueTo + tx.Fee
 		txpointFrom := order.TxPoint{Address: usdc.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
+
+		tx.Type = input.Type
+
+	case "GNT":
+		gnt.UpdateBlockNumber()
+		tx.TimestampBegin = gnt.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = gnt.CurrentHeight
+		tx.BlockHash = gnt.CurrentHash
+		tx.Hash = gnt.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
+
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / gnt.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
+
+		tx.Fee = gnt.Fee
+
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: gnt.COINBASE, Value: common.Float64string(valueFrom)}
+		tx.From = []order.TxPoint{txpointFrom}
+
+		tx.Type = input.Type
+
+	case "ZRX":
+		zrx.UpdateBlockNumber()
+		tx.TimestampBegin = zrx.CurrentTime
+		tx.TimestampFinish = tx.TimestampBegin
+		tx.BlockNumber = zrx.CurrentHeight
+		tx.BlockHash = zrx.CurrentHash
+		tx.Hash = zrx.HashInt(tx.TimestampBegin)
+		tx.Confirmations = 0
+
+		// pseudo random
+		valueTo := float64(tx.TimestampBegin%tx.BlockNumber) / zrx.HEIGHT
+		txpointTo := order.TxPoint{Address: input.Address, Value: common.Float64string(valueTo)}
+		tx.To = []order.TxPoint{txpointTo}
+
+		tx.Fee = zrx.Fee
+
+		valueFrom := valueTo + tx.Fee
+		txpointFrom := order.TxPoint{Address: zrx.COINBASE, Value: common.Float64string(valueFrom)}
 		tx.From = []order.TxPoint{txpointFrom}
 
 		tx.Type = input.Type

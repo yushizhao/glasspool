@@ -11,10 +11,12 @@ import (
 	"github.com/yushizhao/glasspool/node/btc"
 	"github.com/yushizhao/glasspool/node/eos"
 	"github.com/yushizhao/glasspool/node/eth"
+	"github.com/yushizhao/glasspool/node/gnt"
 	"github.com/yushizhao/glasspool/node/ltc"
 	"github.com/yushizhao/glasspool/node/usdc"
 	"github.com/yushizhao/glasspool/node/usdt"
 	"github.com/yushizhao/glasspool/node/xrp"
+	"github.com/yushizhao/glasspool/node/zrx"
 )
 
 func main() {
@@ -27,6 +29,8 @@ func main() {
 	common.InitDB()
 	eth.Init()
 	usdc.Init()
+	gnt.Init()
+	zrx.Init()
 	btc.Init()
 	ltc.Init()
 	usdt.Init()
