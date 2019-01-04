@@ -25,6 +25,7 @@ func keyToAddr(key *btcec.PrivateKey, net *chaincfg.Params) (btcutil.Address, er
 
 func GenerateAddress() (string, error) {
 	child, err := Master.Child(ChildID)
+	ChildID++
 	if err != nil {
 		return "error", err
 	}
