@@ -65,11 +65,24 @@ func callback(url string, body common.ReturnBody) {
 	fmt.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
 }
 
-func addressesNewHandler(req *restful.Request, resp *restful.Response) {
+func safeRead(req *restful.Request) (*common.POSTBody, error) {
+	var f interface{}
+	err := req.ReadEntity(&f)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	log.Println(common.JSONstring(f))
+
+	dataBytes, err := json.Marshal(f)
 	postBody := new(common.POSTBody)
+	json.Unmarshal(dataBytes, postBody)
+	return postBody, err
+}
+
+func addressesNewHandler(req *restful.Request, resp *restful.Response) {
 	returnBody := new(common.ReturnBody)
 
-	err := req.ReadEntity(postBody)
+	postBody, err := safeRead(req)
 	if err != nil { // bad request
 		resp.WriteErrorString(http.StatusBadRequest, err.Error())
 		return
@@ -115,10 +128,10 @@ func addressesNewHandler(req *restful.Request, resp *restful.Response) {
 
 func addressesVerifyHandler(req *restful.Request, resp *restful.Response) {
 	a := req.PathParameter("addr")
-	postBody := new(common.POSTBody)
 	returnBody := new(common.ReturnBody)
 
-	err := req.ReadEntity(postBody)
+	postBody, err := safeRead(req)
+
 	if err != nil { // bad request
 		resp.WriteErrorString(http.StatusBadRequest, err.Error())
 		return
@@ -135,10 +148,9 @@ func addressesVerifyHandler(req *restful.Request, resp *restful.Response) {
 
 // update callback?
 func transactionsHandler(req *restful.Request, resp *restful.Response) {
-	postBody := new(common.POSTBody)
 	returnBody := new(common.ReturnBody)
 
-	err := req.ReadEntity(postBody)
+	postBody, err := safeRead(req)
 	if err != nil { // bad request
 		resp.WriteErrorString(http.StatusBadRequest, err.Error())
 		return
