@@ -8,7 +8,7 @@ type POSTBody struct {
 	Data      interface{} `json:"data"`
 	Hash      string      `json:"hash"`
 	Sig       string      `json:"sig"`
-	Timestamp string      `json:"timestamp"`
+	Timestamp int64       `json:"timestamp"`
 	Path      string      // implication
 }
 
