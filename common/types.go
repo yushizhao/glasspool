@@ -26,6 +26,7 @@ type ReturnBodySig struct {
 	Crypto    string      `json:"crypto"`
 	Timestamp int64       `json:"timestamp"`
 	Sig       SigJSON     `json:"sig"`
+	SendAgain bool        `json"sendAgain"`
 }
 
 // parse data
@@ -52,5 +53,4 @@ func (it *ReturnBody) Normalize(res interface{}) {
 	it.Message = "OK"
 	it.Result = res
 	it.Status = 0
-	it.SendAgain = false
 }
