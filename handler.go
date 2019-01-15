@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -55,14 +54,12 @@ func callback(url string, body common.ReturnBody) {
 		return
 	}
 
-	fmt.Printf("\nURL: %v", url)
+	log.Printf("\nURL: %v", url)
 	// explore response object
-	fmt.Printf("\nError: %v", err)
-	fmt.Printf("\nResponse Status Code: %v", resp.StatusCode())
-	fmt.Printf("\nResponse Status: %v", resp.Status())
-	fmt.Printf("\nResponse Time: %v", resp.Time())
-	fmt.Printf("\nResponse Received At: %v", resp.ReceivedAt())
-	fmt.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
+	log.Printf("\nError: %v", err)
+	log.Printf("\nResponse Status Code: %v", resp.StatusCode())
+	log.Printf("\nResponse Status: %v", resp.Status())
+	log.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
 }
 
 func safeRead(req *restful.Request) (*common.POSTBody, error) {
