@@ -16,7 +16,7 @@ type ReturnBody struct {
 	Message   string      `json:"message"`
 	Result    interface{} `json:"result"`
 	Status    int         `json:"status"`
-	SendAgain bool        `json"sendAgain"`
+	SendAgain bool        `json:"sendAgain"`
 }
 
 type ReturnBodySig struct {
@@ -26,7 +26,7 @@ type ReturnBodySig struct {
 	Crypto    string      `json:"crypto"`
 	Timestamp int64       `json:"timestamp"`
 	Sig       SigJSON     `json:"sig"`
-	SendAgain bool        `json"sendAgain"`
+	SendAgain bool        `json:"sendAgain"`
 }
 
 // parse data
