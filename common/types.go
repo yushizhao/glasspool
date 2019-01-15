@@ -13,9 +13,10 @@ type POSTBody struct {
 }
 
 type ReturnBody struct {
-	Message string      `json:"message"`
-	Result  interface{} `json:"result"`
-	Status  int         `json:"status"`
+	Message   string      `json:"message"`
+	Result    interface{} `json:"result"`
+	Status    int         `json:"status"`
+	SendAgain bool        `json"sendAgain"`
 }
 
 type ReturnBodySig struct {
@@ -51,4 +52,5 @@ func (it *ReturnBody) Normalize(res interface{}) {
 	it.Message = "OK"
 	it.Result = res
 	it.Status = 0
+	it.SendAgain = false
 }
