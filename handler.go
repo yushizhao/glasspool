@@ -43,7 +43,7 @@ func callback(url string, body common.ReturnBody) {
 		}
 	}
 
-	log.Printf("\ncallback\n")
+	log.Printf("callback " + url)
 	log.Printf(common.JSONstring(returnBody))
 
 	resp, err := resty.R().
@@ -51,16 +51,16 @@ func callback(url string, body common.ReturnBody) {
 		SetBody(returnBody).
 		Post(url)
 	if err != nil {
-		log.Printf("\ncallback err %v: %v", url, err)
+		log.Printf("callback err %v: %v", url, err)
 		return
 	}
 
-	log.Printf("\nURL: %v", url)
+	log.Printf("URL: %v", url)
 	// explore response object
-	log.Printf("\nError: %v", err)
-	log.Printf("\nResponse Status Code: %v", resp.StatusCode())
-	log.Printf("\nResponse Status: %v", resp.Status())
-	log.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
+	log.Printf("Error: %v", err)
+	log.Printf("Response Status Code: %v", resp.StatusCode())
+	log.Printf("Response Status: %v", resp.Status())
+	log.Printf("Response Body: %v", resp) // or resp.String() or string(resp.Body())
 }
 
 func safeRead(req *restful.Request) (*common.POSTBody, error) {
