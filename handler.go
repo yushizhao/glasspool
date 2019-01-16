@@ -22,7 +22,6 @@ func callback(url string, body common.ReturnBody) {
 		Crypto:    "ecc",
 		Timestamp: common.Timestamp(),
 		Sig:       common.SigJSON{},
-		SendAgain: false,
 	}
 
 	if common.ECC {

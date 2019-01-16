@@ -37,6 +37,7 @@ type POSTTransactionsResult struct {
 	Fee           string `json:"fee"`
 	Hash          string `json:"hash"`
 	Index         string `json:"id"`
+	SendAgain     bool   `json:"sendAgain"`
 	State         string `json:"state"`
 	To            string `json:"to"`
 	UpdateAt      int64  `json:"update_at"`
@@ -410,5 +411,6 @@ func (input TxData) Submit(bizType string) (output POSTTransactionsResult, err e
 	output.State = input.State
 	output.UpdateAt = common.Timestamp()
 	output.Index = common.Gdb.OrderID()
+	output.SendAgain = false
 	return output, nil
 }
