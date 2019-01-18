@@ -3,12 +3,12 @@ package cyb
 import "time"
 
 const (
-	ACCOUNT = "APDAE-CYB" // also used as coinbase
+	ACCOUNT = "GLASSPOOL-CYB" // also used as coinbase
 
 	HEIGHT    = 25999024
 	TIMESTAMP = 1541719459000
 	TIMESPAN  = 505
-	COINBASE  = "APDAE-CYB"
+	COINBASE  = "GLASSPOOL-CYB"
 )
 
 var (

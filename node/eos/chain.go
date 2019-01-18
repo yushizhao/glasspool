@@ -3,12 +3,12 @@ package eos
 import "time"
 
 const (
-	ACCOUNT = "EOSXDAEX" // also used as coinbase
+	ACCOUNT = "GLASSPOOL-EOS" // also used as coinbase
 
 	HEIGHT    = 25999024
 	TIMESTAMP = 1541719459000
 	TIMESPAN  = 505
-	COINBASE  = "EOSXDAEX"
+	COINBASE  = "GLASSPOOL-EOS"
 )
 
 var (
