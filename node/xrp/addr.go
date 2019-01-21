@@ -1,6 +1,10 @@
 package xrp
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
@@ -23,19 +27,26 @@ func keyToAddr(key *btcec.PrivateKey, net *chaincfg.Params) (btcutil.Address, er
 	return pubKeyAddr.AddressPubKeyHash(), nil
 }
 
-func GenerateAddress() (string, error) {
-	child, err := Master.Child(ChildID)
-	ChildID++
-	if err != nil {
-		return "error", err
-	}
-	key, err := child.ECPrivKey()
-	if err != nil {
-		return "error", err
-	}
-	addr, err := keyToAddr(key, NET)
-	if err != nil {
-		return "error", err
-	}
-	return addr.EncodeAddress(), nil
+// func GenerateAddress() (string, error) {
+// 	child, err := Master.Child(ChildID)
+// 	ChildID++
+// 	if err != nil {
+// 		return "error", err
+// 	}
+// 	key, err := child.ECPrivKey()
+// 	if err != nil {
+// 		return "error", err
+// 	}
+// 	addr, err := keyToAddr(key, NET)
+// 	if err != nil {
+// 		return "error", err
+// 	}
+// 	return addr.EncodeAddress(), nil
+// }
+
+func GenerateAddress() string {
+	t := time.Now().String()
+	sha256sum := sha256.Sum256([]byte(t))
+	s := base64.StdEncoding.EncodeToString(sha256sum[20:])
+	return COINBASE + "[" + s + "]"
 }

@@ -98,12 +98,12 @@ func (input POSTAddressesNew) Process() (output POSTAddressesNewResult, err erro
 		output.State = "used"
 		return output, nil
 	case "XRP":
-		address, err := xrp.GenerateAddress()
+		address := xrp.GenerateAddress()
 		output.Address = address
 		output.State = "used"
-		return output, err
+		return output, nil
 	default:
-		return output, fmt.Errorf("unexpected type: %v", input.Type)
+		return output, nil
 	}
 }
 
